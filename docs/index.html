@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Reveal JS presentation</title>
+
+  <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+  <meta name="author" content="Hakim El Hattab">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="libs/reveal.js/4.3.1/reset.css">
+  <link rel="stylesheet" href="libs/reveal.js/4.3.1/reveal.css">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+  <!-- highlight Theme -->
+  
+  <link rel="stylesheet" href="libs/highlight.js/11.3.1/styles/monokai.min.css">
+  
+	
+		
+	<link rel="stylesheet" href="libs/reveal.js/4.3.1/plugin/chalkboard/style.css">
+	
+	
+	
+	
+
+
+
+  <!-- Revealjs Theme -->
+  
+  <link rel="stylesheet" href="libs/reveal.js/4.3.1/theme/League.css" id="theme">
+  
+  
+
+  <link rel="stylesheet" href="libs/styles/tasklist.css">
+	<link rel="stylesheet" href="libs/styles/iota.css">
+	<link rel="stylesheet" href="libs/styles/layout.css">
+
+
+  <!-- Revealjs Theme -->
+  
+
+   <!-- css list -->
+	
+
+   
+
+</head>
+
+<body>
+
+   
+
+  <div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+
+      
+
+
+    
+        <section >
+            
+            <div class="r-fit-text">
+<h2>論理削除をやめて状態遷移で管理した方がいいかも</h2>
+</div>
+<p>ひがき</p>
+<p>@higaki_program</p>
+
+            </section>
+    
+
+
+
+    
+        <section >
+            
+            <div class="r-fit-text">
+論理削除について勉強したので、
+<p>誰かの役に立てばと思いまとめてみる</p>
+</div>
+<div class="r-fit-text">
+感想・誤り等ありましたら、ご連絡いただけます嬉しいです！
+</div>
+<p>twitter</p>
+<p>@higaki_program</p>
+<img src="image/QR_twitter.png" height="200">
+            </section>
+    
+
+
+
+    
+        <section >
+            
+            <h3>参考</h3>
+<div class="r-fit-text">
+<p><a href="https://fukabori.fm/episode/27">27. 論理削除とは何か？どのような解法があるのか？ w/ twada</a></p>
+<p><a href="https://www.amazon.co.jp/%E5%A4%B1%E6%95%97%E3%81%8B%E3%82%89%E5%AD%A6%E3%81%B6RDB%E3%81%AE%E6%AD%A3%E3%81%97%E3%81%84%E6%AD%A9%E3%81%8D%E6%96%B9-Software-Design-plus-%E6%9B%BD%E6%A0%B9/dp/4297104083/ref=d_pd_vtp_sccl_2_10/356-9914192-9182259?pd_rd_w=bIg6d&amp;content-id=amzn1.sym.cbb45385-7b99-44b7-a528-bff5ddaa153d&amp;pf_rd_p=cbb45385-7b99-44b7-a528-bff5ddaa153d&amp;pf_rd_r=G7TCNGTHE5808Y3KBS2B&amp;pd_rd_wg=j9imZ&amp;pd_rd_r=f7a933bf-707a-47dd-a11a-a0be4cc51e2d&amp;pd_rd_i=4297104083&amp;psc=1">失敗から学ぶRDBの正しい歩き方 (Software Design plus)</a></p>
+<p><a href="https://www.amazon.co.jp/%E9%81%94%E4%BA%BA%E3%81%AB%E5%AD%A6%E3%81%B6DB%E8%A8%AD%E8%A8%88-%E5%BE%B9%E5%BA%95%E6%8C%87%E5%8D%97%E6%9B%B8-%E5%88%9D%E7%B4%9A%E8%80%85%E3%81%A7%E7%B5%82%E3%82%8F%E3%82%8A%E3%81%9F%E3%81%8F%E3%81%AA%E3%81%84%E3%81%82%E3%81%AA%E3%81%9F%E3%81%B8-%E3%83%9F%E3%83%83%E3%82%AF/dp/4798124702/ref=pd_lpo_1?pd_rd_w=BQigu&amp;content-id=amzn1.sym.d769922e-188a-40cc-a180-3315f856e8d6&amp;pf_rd_p=d769922e-188a-40cc-a180-3315f856e8d6&amp;pf_rd_r=JFJZQ2AQ69AVR0ZJ607N&amp;pd_rd_wg=1lQwh&amp;pd_rd_r=fdefdcb0-cb36-4a7b-a955-4fb459739d46&amp;pd_rd_i=4798124702&amp;psc=1">達人に学ぶDB設計 徹底指南書 初級者で終わりたくないあなたへ</a></p>
+</div>
+            </section>
+    
+
+
+
+    
+        <section >
+            
+            <h3>LT内の論理削除</h3>
+<div class="r-fit-text">
+  削除フラグを用いて、あるレコードを削除したことにする
+</div>
+            </section>
+    
+
+
+
+    
+        <section >
+            
+            <h3>具体例で考えてみよう</h3>
+<p>ユーザーは以下の状態を持つ</p>
+<div>
+  <ul>
+    <li>登録済</li>
+    <li>削除済</li>
+  </ul>
+</div>
+<img src="image/user_state01.png" height="200">
+            </section>
+    
+
+
+
+    
+    <section>
+        <section >
+            <h3>論理削除はやめた方が良いかも</h3>
+<div class="r-fit-text">
+<p>論理削除は実装が簡単だから、ついつい手を出してしまいがちだが、</p>
+<p>個人的にはおすすめできない</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+<th>created_at</th>
+<th>updated_at</th>
+<th>is_deleted</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>佐藤</td>
+<td><a href="mailto:sato@example.com">sato@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>本村</td>
+<td><a href="mailto:motomura@example.com">motomura@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+            </section>
+        
+            <section >
+                <h3>メリット</h3>
+<div>
+  <ul>
+    <li>実装が楽</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <h3>デメリット</h3>
+<div class="r-fit-text">
+  <ul>
+    <li>1カラムに削除済かどうかの情報しかない</li>
+    <li>SQLに「削除フラグ=0」が必要になる</li>
+    <li>unique制約に削除フラグを含める必要がある</li>
+    <li>デフォルトで「削除フラグ=0」を含む設定にする場合、「削除フラグ=1」を検索したい場合に少し複雑になる</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <h4>こんな場合は使用してもいいかも</h4>
+<div class="r-fit-text">
+  <ul>
+    <li>削除された時間は必要ない</li>
+    <li>削除されるレコードが少なく、検索スピードにあまり影響しない</li>
+    <li>扱うモデルの状態がシンプル</li>
+    <li>特別な事情あり</li>
+  </ul>
+</div>
+            </section>
+        
+
+    </section>
+    
+
+
+
+    
+    <section>
+        <section >
+            <div class="r-fit-text">
+<h3>（代替案１）削除日時にする（おすすめでない）</h3>
+<p>昔のORMでは主流の実装だったみたい。</p>
+<p>例）</p>
+<p>デフォルトを9999年1月1日12時0分0秒にして、削除処理が行われた時間に更新する。</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+<th>created_at</th>
+<th>updated_at</th>
+<th>deleted_at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>9999-01-01 12:00:00</td>
+</tr>
+<tr>
+<td>2</td>
+<td>佐藤</td>
+<td><a href="mailto:sato@example.com">sato@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>9999-01-01 12:00:00</td>
+</tr>
+<tr>
+<td>3</td>
+<td>本村</td>
+<td><a href="mailto:motomura@example.com">motomura@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-11-12 14:12:54</td>
+</tr>
+</tbody>
+</table>
+<p>削除：deleted_at &lt; 現在時刻</p>
+<p>Not削除：現在時刻 &lt; deleted_at</p>
+</div>
+            </section>
+        
+            <section >
+                <div>
+<p>ORM例</p>
+<table>
+<thead>
+<tr>
+<th>言語</th>
+<th>ORM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ruby</td>
+<td>ActiveRecord</td>
+</tr>
+<tr>
+<td>PHP</td>
+<td>Eloquent</td>
+</tr>
+</tbody>
+</table>
+</div>
+            </section>
+        
+            <section >
+                <h3>メリット</h3>
+<div>
+  <ul>
+    <li>ORMを使用すれば実装が楽</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <h3>デメリット</h3>
+<div class="r-fit-text">
+  <ul>
+    <li>1カラムに削除された時間の情報しかない</li>
+    <li>SQLに「現在時刻 < deleted_at」が必要になる</li>
+    <li>unique制約に削除日時を含める必要がある</li>
+    <li>デフォルトで「現在時刻 < deleted_at」を含む設定にする場合、「deleted_at < 現在時刻」を検索したい場合に少し複雑になる</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <div class="r-fit-text">
+<h4>こんな場合は使用してもいいかも</h4>
+  <ul>
+    <li>削除されるレコードが少なく、検索スピードにあまり影響しない</li>
+    <li>扱うモデルの状態がシンプル</li>
+    <li>特別な事情あり</li>
+  </ul>
+</div>
+            </section>
+        
+
+    </section>
+    
+
+
+
+    
+    <section>
+        <section >
+            <div class="r-fit-text">
+<h3>（代替案２）状態遷移でモデリングする。</h3>
+<p>ステートマシンライブラリを用いて</p>
+<p>enum型 or varchar型の状態カラムを追加する。</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+<th>created_at</th>
+<th>updated_at</th>
+<th>state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>Registered</td>
+</tr>
+<tr>
+<td>2</td>
+<td>佐藤</td>
+<td><a href="mailto:sato@example.com">sato@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>Registered</td>
+</tr>
+<tr>
+<td>3</td>
+<td>本村</td>
+<td><a href="mailto:motomura@example.com">motomura@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>Deleted</td>
+</tr>
+</tbody>
+</table>
+<p>PHP ステートマシンライブラリ</p>
+<p><a href="http://yohan.giarel.li/Finite/">A PHP5.3+ Finite State Machine</a></p>
+</div>
+            </section>
+        
+            <section >
+                <h3>メリット</h3>
+<div>
+  <ul>
+    <li>ステートマシンライブラリを用いると実装が楽</li>
+    <li>状態の追加が容易</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <h3>デメリット</h3>
+<div class="r-fit-text">
+  <ul>
+    <li>SQLに「状態 <> "Deleted"」等が必要になる</li>
+    <li>デフォルトで「状態 <> "Deleted"」を含む設定にする場合、「状態 = "Deleted"」を検索したい場合に少し複雑になる</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <div class="r-fit-text">
+<h4>こんな場合は使用してもいいかも</h4>
+  <ul>
+    <li>削除されるレコードが少なく、検索スピードにあまり影響しない</li>
+    <li>扱うモデルの状態が複雑</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <div class="r-fit-text">
+<h3>状態変化時</h3>
+<p>仮登録の状態が追加となる場合</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+<th>created_at</th>
+<th>updated_at</th>
+<th>state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>Registered</td>
+</tr>
+<tr>
+<td>2</td>
+<td>佐藤</td>
+<td><a href="mailto:sato@example.com">sato@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>Temporary <br> Registered</td>
+</tr>
+<tr>
+<td>3</td>
+<td>本村</td>
+<td><a href="mailto:motomura@example.com">motomura@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>Deleted</td>
+</tr>
+</tbody>
+</table>
+</div>
+<img src="image/user_state_some.png" height="200">
+            </section>
+        
+
+    </section>
+    
+
+
+
+    
+    <section>
+        <section >
+            <div class="r-fit-text">
+<h3>（代替案３）履歴テーブルをトリガーで作成する。</h3>
+<p>userテーブルとdeleted_userテーブルが作成される</p>
+<p>userテーブル</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+<th>created_at</th>
+<th>updated_at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+</tr>
+<tr>
+<td>2</td>
+<td>佐藤</td>
+<td><a href="mailto:sato@example.com">sato@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+</tr>
+<tr>
+<td>3</td>
+<td>本村</td>
+<td><a href="mailto:motomura@example.com">motomura@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+</tr>
+</tbody>
+</table>
+<p>deleted_userテーブル</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+<th>created_at</th>
+<th>updated_at</th>
+<th>deleted_at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>9999-01-01 12:00:00</td>
+</tr>
+<tr>
+<td>2</td>
+<td>佐藤</td>
+<td><a href="mailto:sato@example.com">sato@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>9999-01-01 12:00:00</td>
+</tr>
+<tr>
+<td>3</td>
+<td>本村</td>
+<td><a href="mailto:motomura@example.com">motomura@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-12-01 12:00:00</td>
+<td>2022-11-12 14:12:54</td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://dev.mysql.com/doc/refman/5.6/ja/trigger-syntax.html">MySQL Document(20.3 トリガーの使用)</a></p>
+<p>削除となるレコードが多い場合。</p>
+<p>ログとしてDBに残しておきたい。</p>
+<p>ユーザーには削除されたように見えるけど、本当は削除したくない。</p>
+<p>状態やフラグにテーブルに一つしか貼れないインデックスを取られたくない。</p>
+</div>
+            </section>
+        
+            <section >
+                <h3>メリット</h3>
+<div>
+  <ul>
+    <li>削除済のDBが分かれているので検索が早い</li>
+    <li>状態やフラグにインデックスを貼らなくてもよくなる</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <h3>デメリット</h3>
+<div class="r-fit-text">
+  <ul>
+    <li>テーブル数が増える</li>
+    <li>外部キー制約を設定する場合、複数の削除済テーブルを作成する必要がある</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <div class="r-fit-text">
+<h4>こんな場合は使用してもいいかも</h4>
+  <ul>
+    <li>削除されるレコードが多く、検索スピードに影響する</li>
+    <li>テーブル数が多くなっても問題ない</li>
+  </ul>
+</div>
+            </section>
+        
+
+    </section>
+    
+
+
+
+    
+    <section>
+        <section >
+            <div class="r-fit-text">
+<h3>（代替案４）更新も削除もしない</h3>
+<p>起こった事実のみをDBに格納していく。</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>user_id</th>
+<th>name</th>
+<th>email</th>
+<th>created_at</th>
+<th>state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>Temporary <br> Registered</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-10 12:00:00</td>
+<td>Registered</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>檜垣</td>
+<td><a href="mailto:higaki@example.com">higaki@example.com</a></td>
+<td>2022-12-20 12:00:00</td>
+<td>Deleted</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>佐藤</td>
+<td><a href="mailto:sato@example.com">sato@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>Temporary <br> Registered</td>
+</tr>
+<tr>
+<td>5</td>
+<td>3</td>
+<td>本村</td>
+<td><a href="mailto:motomura@example.com">motomura@example.com</a></td>
+<td>2022-12-01 12:00:00</td>
+<td>Registered</td>
+</tr>
+</tbody>
+</table>
+</div>
+            </section>
+        
+            <section >
+                <h3>メリット</h3>
+<div class="r-fit-text">
+  <ul>
+    <li>更新や削除が行われないので、基本的にデータの改ざん・喪失を考えなくて良い</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <h3>デメリット</h3>
+<div class="r-fit-text">
+  <ul>
+    <li>膨大なデータになる</li>
+    <li>常にorder byで最新の状態を取得する必要がある</li>
+  </ul>
+</div>
+            </section>
+        
+            <section >
+                <div class="r-fit-text">
+<h4>こんな場合は使用してもいいかも</h4>
+  <ul>
+    <li>使用するデータが膨大にならない</li>
+    <li>データが膨大になる場合、お金で解決できる場合</li>
+    <li>速度よりも堅牢さが重要なシステム</li>
+  </ul>
+</div>
+            </section>
+        
+
+    </section>
+    
+
+
+
+    
+        <section >
+            
+            <div class="r-fit-text">
+<h3>「誤った操作を元に戻したい」要望があった場合</h3>
+  <ul>
+    <li>誤操作しにくい画面にしよう</li>
+    <li>遅延レプリケーション</li>
+  </ul>
+</div>
+            </section>
+    
+
+
+    </div>
+
+
+  </div>
+
+  <div class="line top"></div>
+  <div class="line bottom"></div>
+  <div class="line left"></div>
+  <div class="line right"></div>
+
+  <script src="libs/reveal.js/4.3.1/reveal.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/notes/notes.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/markdown/markdown.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/highlight/highlight.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/math/math.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/fullscreen/plugin.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/animate/plugin.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/animate/svg.min.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/anything/plugin.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/anything/Chart.min.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/anything/d3/d3.v3.min.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/anything/d3.patch.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/anything/d3/queue.v1.min.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/anything/d3/topojson.v1.min.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/anything/function-plot.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/customcontrols/plugin.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/embed-tweet/plugin.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/chart/chart.min.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/chart/plugin.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/verticator/verticator.js"></script>
+
+<script src="libs/reveal.js/4.3.1/plugin/zoom/zoom.js"></script>
+<script src="libs/reveal.js/4.3.1/plugin/search/search.js"></script>
+
+<script src="libs/reveal.js/4.3.1/plugin/chalkboard/plugin.js"></script>
+
+<!--	<script src="libs/reveal.js/4.3.1/plugin/audio-slideshow/plugin.js"></script>  -->
+<!--	<script src="libs/reveal.js/4.3.1/plugin/audio-slideshow/recorder.js"></script>-->
+<!--	<script src="libs/reveal.js/4.3.1/plugin/audio-slideshow/RecordRTC.js"></script>-->
+
+  
+
+<script>
+  const printPlugins = [
+      RevealNotes,
+      RevealHighlight,
+      RevealMath.MathJax3,
+      RevealAnimate,
+      RevealChalkboard, 
+			RevealEmbedTweet,
+			RevealChart,
+		];
+
+		const plugins =  [...printPlugins,
+		RevealZoom, 
+		RevealSearch, 
+				RevealMarkdown, 
+				
+				RevealFullscreen,
+				RevealAnything,
+				//RevealAudioSlideshow,
+				//RevealAudioRecorder,
+				
+				// poll
+				// question
+				// seminar
+				Verticator 
+				 ]
+
+
+		// Also available as an ES module, see:
+		// https://revealjs.com/initialization/
+		Reveal.initialize({
+			controls: true,
+      controlsTutorial: true,
+      controlsLayout: 'bottom-right',
+      controlsBackArrows: 'faded',
+      progress: true,
+      slideNumber: false,
+      //#showSlideNumber "all" "print" "speaker"
+      hash: true, //# hash: false,
+      //# respondToHashChanges: true,
+      //# history: false,
+      keyboard: true,
+      //#keyboardCondition: null,
+      overview: true,
+      center: true,
+      touch: true,
+      loop: false,
+      rtl: false,
+      //#navigationMode: 'default', linear grid
+      shuffle: false,
+      fragments: true,
+      fragmentInURL: false,
+      embedded: false,
+      help: true,
+      //#pause: true
+      showNotes: false,
+      autoPlayMedia: false, // TODO fix this to a nullable value
+      //#preloadIframes: null. true false
+      //#autoAnimate: true
+      //#autoAnimateMatcher: null,
+      //#autoAnimateEasing: 'ease',
+      //autoAnimateDuration: 1.0,
+      //#autoAnimateUnmatched: true
+      //#autoAnimateStyles: []
+      autoSlide: 0, // TODO fix this to a falseable value
+      autoSlideStoppable: true,
+      autoSlideMethod: '0',
+      defaultTiming: 120,
+      mouseWheel: false,
+      //#previewLinks: false
+      //#postMessage: true, // TODO : this can cause issues with the vscode api ???
+      //#postMessageEvents: false,
+      //#focusBodyOnPageVisibilityChange: true,
+      transition: 'defalut',
+      transitionSpeed: 'default',
+      backgroundTransition: 'fade',
+      //#pdfMaxPagesPerSlide: Number.POSITIVE_INFINITY,
+      //#pdfSeparateFragments: true,
+      //#pdfPageHeightOffset: -1,
+      viewDistance: 3,
+      //#mobileViewDistance: 2,
+      display: 'block',
+      //#hideInactiveCursor: true,
+      //#hideCursorTime: 5000
+
+      // Parallax Background
+      parallaxBackgroundImage: '',
+      parallaxBackgroundSize: '',
+      parallaxBackgroundHorizontal: 0,
+      parallaxBackgroundVertical: 0,
+
+      //Presentation Size
+      width: 960,
+			height: 700,
+			margin: 0.04,
+      minScale: 0.2,
+      maxScale: 2,
+      disableLayout: false,
+
+      audio: {
+        prefix: 'audio/', // audio files are stored in the "audio" folder
+        suffix: '.ogg', // audio files have the ".ogg" ending
+        textToSpeechURL: null, // the URL to the text to speech converter
+        defaultNotes: false, // use slide notes as default for the text to speech converter
+        defaultText: false, // use slide text as default for the text to speech converter
+        advance: 0, // advance to next slide after given time in milliseconds after audio has played, use negative value to not advance
+        autoplay: false, // automatically start slideshow
+        defaultDuration: 5, // default duration in seconds if no audio is available
+        defaultAudios: true, // try to play audios with names such as audio/1.2.ogg
+        playerOpacity: 0.05, // opacity value of audio player if unfocused
+        playerStyle: 'position: fixed; bottom: 4px; left: 25%; width: 50%; height:75px; z-index: 33;', // style used for container of audio controls
+        startAtFragment: false, // when moving to a slide, start at the current fragment or at the start of the slide
+      },
+      
+      chalkboard: { // font-awesome.min.css must be available
+        //src: "chalkboard/chalkboard.json",
+        storage: "chalkboard-demo",
+      },
+      
+			customcontrols: {
+					controls: [
+      						{
+						  id: 'toggle-overview',
+						  title: 'Toggle overview (O)',
+						  icon: '<i class="fa fa-th"></i>',
+						  action: 'Reveal.toggleOverview();'
+						}
+						,
+      {
+        icon: '<i class="fa fa-pen-square"></i>',
+        title: 'Toggle chalkboard (B)',
+        action: 'RevealChalkboard.toggleChalkboard();'
+      },
+      {
+        icon: '<i class="fa fa-pen"></i>',
+        title: 'Toggle notes canvas (C)',
+        action: 'RevealChalkboard.toggleNotesCanvas();'
+      }
+      
+				]
+			},
+			chart: {
+					defaults: { 
+						color: 'lightgray', // color of labels
+						scale: { 
+							beginAtZero: true, 
+							ticks: { stepSize: 1 },
+							grid: { color: "lightgray" } , // color of grid lines
+						},
+					},
+					line: { borderColor: [ "rgba(20,220,220,.8)" , "rgba(220,120,120,.8)", "rgba(20,120,220,.8)" ], "borderDash": [ [5,10], [0,0] ] }, 
+					bar: { backgroundColor: [ "rgba(20,220,220,.8)" , "rgba(220,120,120,.8)", "rgba(20,120,220,.8)" ]}, 
+					pie: { backgroundColor: [ ["rgba(0,0,0,.8)" , "rgba(220,20,20,.8)", "rgba(20,220,20,.8)", "rgba(220,220,20,.8)", "rgba(20,20,220,.8)"] ]},
+					radar: { borderColor: [ "rgba(20,220,220,.8)" , "rgba(220,120,120,.8)", "rgba(20,120,220,.8)" ]}, 
+			},
+			math: {
+				mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+				config: 'TeX-AMS_HTML-full',
+				// pass other options into `MathJax.Hub.Config()`
+				TeX: { Macros: { RR: "{\\bf R}" } }
+				},
+				anything: [ 
+				{
+		className: "plot",
+		defaults: {width:500, height: 500, grid:true},
+		initialize: (function(container, options){ options.target = "#"+container.id; functionPlot(options) })
+	 },
+	 {
+		className: "chart",  
+		initialize: (function(container, options){ container.chart = new Chart(container.getContext("2d"), options);  })
+	 },
+	 {
+		className: "anything",
+		initialize: (function(container, options){ if (options && options.initialize) { options.initialize(container)} })
+	 },
+					],
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: (window.location.search.match(/print-pdf/gi) ? printPlugins : plugins ) 
+		});
+			
+
+
+	    // Change chalkboard theme : 
+		function changeTheme(input) {
+			var config = {};
+			config.theme = input.value;
+			Reveal.getPlugin("RevealChalkboard").configure(config);
+			input.blur();
+		}
+
+		// // Handle the message inside the webview
+        // window.addEventListener('message', event => {
+
+        //     const message = event.data; // The JSON data our extension sent
+
+        //     switch (message.command) {
+        //         case 'refactor':
+        //             Reveal.toggleHelp();
+        //     }
+        // });
+
+		if (window.location.search.match(/print-pdf-now/gi)) {
+      		setTimeout(() => {
+				window.print();
+			  }, 2500);
+			
+    }
+</script>
+
+</body>
+
+</html>
